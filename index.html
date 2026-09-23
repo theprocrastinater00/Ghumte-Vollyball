@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ne">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>पाँचौ सिल्भर रनिङ कप २०२६</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div><small>GHUMTE YUWA PARIWAR JAPAN</small><h1>पाँचौ सिल्भर रनिङ कप २०२६</h1><p>पुरुष तथा महिला भलिबल प्रतियोगिता</p></div>
+  <button id="download" disabled>तयार ब्यानर डाउनलोड गर्नुहोस्</button>
+</header>
+<main>
+<section class="editor">
+  <div class="head">
+    <div><h2>फोटो ब्यानर बनाउनुहोस्</h2><p>फोटो overlay को पछाडि राखिन्छ — कुनै masking वा cropping हुँदैन।</p></div>
+    <label class="upload"><input id="upload" type="file" accept="image/*">फोटो अपलोड गर्नुहोस्</label>
+  </div>
+  <div class="hint">📱 मोबाइलमा: फोटोको bounding box भित्र drag गरेर move गर्नुहोस्। चार कुनाका handle समातेर resize गर्नुहोस्।</div>
+  <div class="stage"><canvas id="canvas" width="2048" height="2048"></canvas><div id="box"><i class="nw"></i><i class="ne"></i><i class="sw"></i><i class="se"></i></div></div>
+  <div class="actions"><button id="reset">स्थिति Reset</button><span id="status">पहिले फोटो अपलोड गर्नुहोस्</span></div>
+</section>
+
+<section class="details">
+  <div class="kicker">EVENT PROGRAM</div><h2>कार्यक्रम तथा पुरस्कार विवरण</h2>
+
+  <div class="highlight">
+    <div><small>TITLE SPONSOR</small><strong>Yehey Remit</strong><p>YEHEY JAPAN CO., LTD.</p></div>
+    <div><small>DATE</small><strong>THURSDAY, OCTOBER 8, 2026</strong></div>
+    <div><small>VENUE</small><strong>USHIKU SPORTS PARK</strong><p>1400 Shimonecho, Ushiku, Ibaraki 300-1203</p></div>
+  </div>
+
+  <div class="sponsor"><small>TITLE SPONSOR</small><b>Yehey Remit</b><span>YEHEY JAPAN CO., LTD.</span><em>Official Title Sponsor</em></div>
+
+  <div class="grids">
+    <article><h3>🏐 पुरुष भलिबल प्रतियोगिता</h3>
+      <div class="prize">प्रथम पुरस्कार <b>¥361,000</b><small>ट्रफी, मेडल र प्रमाणपत्र</small></div>
+      <div class="prize">द्वितीय पुरस्कार <b>¥241,000</b><small>ट्रफी, मेडल र प्रमाणपत्र</small></div>
+      <div class="prize">सान्त्वना पुरस्कार <b>¥61,000</b><small>मेडल र प्रमाणपत्र</small></div>
+      <div class="fee">दर्ता शुल्क: <b>¥49,000</b></div>
+    </article>
+    <article><h3>🏐 महिला भलिबल प्रतियोगिता</h3>
+      <div class="prize">प्रथम पुरस्कार <b>¥151,000</b><small>ट्रफी, मेडल र प्रमाणपत्र</small></div>
+      <div class="prize">द्वितीय पुरस्कार <b>¥81,000</b><small>ट्रफी, मेडल र प्रमाणपत्र</small></div>
+      <div class="fee">दर्ता शुल्क: <b>¥25,000</b></div>
+    </article>
+  </div>
+
+  <div class="partners">
+    <div><small>HOSPITALITY PARTNER</small><b>Buki Restaurant & Bar</b></div>
+    <div><small>MEDIA PARTNER</small><b>जनहित न्यूज / Janahit News</b></div>
+  </div>
+</section>
+</main>
+
+<script>
+const W=2048,H=2048, area={x:500,y:495,w:1045,h:1000};
+const c=document.getElementById('canvas'),ctx=c.getContext('2d');
+const box=document.getElementById('box'),stage=document.querySelector('.stage');
+const upload=document.getElementById('upload'),download=document.getElementById('download');
+const reset=document.getElementById('reset'),status=document.getElementById('status');
+const overlay=new Image(); overlay.src='assets/image2-overlay.png';
+const photo=new Image(); let ready=false,rect=null,action=null;
+
+function point(e){const r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height}}
+function fit(){if(!ready)return;let q=photo.naturalWidth/photo.naturalHeight,w=area.w,h=w/q;if(h>area.h){h=area.h;w=h*q}rect={x:area.x+(area.w-w)/2,y:area.y+(area.h-h)/2,w,h};render()}
+function clamp(){rect.w=Math.max(80,rect.w);rect.h=Math.max(80,rect.h);rect.x=Math.max(0,Math.min(W-rect.w,rect.x));rect.y=Math.max(0,Math.min(H-rect.h,rect.y))}
+function updateBox(){if(!ready){box.style.display='none';return}let r=c.getBoundingClientRect(),sx=r.width/W,sy=r.height/H;box.style.display='block';box.style.left=rect.x*sx+'px';box.style.top=rect.y*sy+'px';box.style.width=rect.w*sx+'px';box.style.height=rect.h*sy+'px'}
+function render(){ctx.clearRect(0,0,W,H);if(ready)ctx.drawImage(photo,rect.x,rect.y,rect.w,rect.h);if(overlay.complete)ctx.drawImage(overlay,0,0,W,H);updateBox()}
+
+upload.onchange=()=>{let f=upload.files[0];if(!f)return;let u=URL.createObjectURL(f);photo.onload=()=>{ready=true;URL.revokeObjectURL(u);download.disabled=false;status.textContent='फोटो चयन भयो — bounding box drag/resize गर्नुहोस्';fit()};photo.src=u}
+overlay.onload=render; reset.onclick=fit; addEventListener('resize',updateBox);
+
+function start(e,h){if(!ready)return;e.preventDefault();let p=point(e);action={h:h,x:p.x,y:p.y,r:{...rect}}}
+function move(e){if(!action)return;e.preventDefault();let p=point(e),dx=p.x-action.x,dy=p.y-action.y,r=action.r;
+ if(action.h==='move')rect={x:r.x+dx,y:r.y+dy,w:r.w,h:r.h};
+ else{let a=r.w/r.h,x=r.x,y=r.y,w=r.w,h=r.h;
+  if(action.h==='se'){w=Math.max(80,r.w+dx);h=w/a}
+  if(action.h==='sw'){w=Math.max(80,r.w-dx);h=w/a;x=r.x+r.w-w}
+  if(action.h==='ne'){w=Math.max(80,r.w+dx);h=w/a;y=r.y+r.h-h}
+  if(action.h==='nw'){w=Math.max(80,r.w-dx);h=w/a;x=r.x+r.w-w;y=r.y+r.h-h}
+  rect={x,y,w,h}
+ } clamp();render()}
+box.addEventListener('pointerdown',e=>start(e,e.target.dataset.handle||'move'));
+box.addEventListener('pointermove',move);box.addEventListener('pointerup',()=>action=null);box.addEventListener('pointercancel',()=>action=null);
+
+['nw','ne','sw','se'].forEach(k=>box.querySelector('.'+k).dataset.handle=k);
+
+download.onclick=()=>{ctx.clearRect(0,0,W,H);ctx.drawImage(photo,rect.x,rect.y,rect.w,rect.h);ctx.drawImage(overlay,0,0,W,H);let a=document.createElement('a');a.download='ghumte-yuwa-pariwar-volleyball-2026-banner.png';a.href=c.toDataURL('image/png');a.click();render()}
+</script>
+</body></html>
